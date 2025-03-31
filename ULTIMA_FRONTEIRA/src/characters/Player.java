@@ -3,7 +3,6 @@ package characters;
 import main.GamePanel;
 import main.KeyHandler;
 import main.UtilityTool;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -16,11 +15,6 @@ public class Player extends Entity {
 
     public final int screenX;
     public final int screenY;
-
-    //protected BufferedImage up1, up2, down1, down2, left1, left2, right1, right2; //são imagens que representam o jogador em diferentes direções e animações.
-    //protected String direction; //Armazena a direção em que o jogador está se movendo (cima, baixo, esquerda ou direita).
-    //protected int spriteCounter = 0; //Usado para controlar o tempo entre as trocas de sprite
-    //protected int spriteNum = 1;
 
     int counter2=0;
 
@@ -42,20 +36,17 @@ public class Player extends Entity {
     }
 
     public void setDefaultValues() { //Este método definie valores iniciais para a posição do jogador, sua velocidade e direção inicial
-        worldX = gp.tileSize*23;
-        worldY = gp.tileSize*21;
+        worldX = gp.tileSize*49;
+        worldY = gp.tileSize*49;
         speed = 2;
         direction = "down";
     }
 
     public void getPlayerImage() {}
 
-
     public void update() { //Este método atualiza a posição e a animação do jogador com base nas teclas pressionadas
 
         if(keyH.upPressed==true || keyH.downPressed==true || keyH.leftPressed==true || keyH.rightPressed==true){
-
-            //System.out.println("Tecla pressionada: " + direction);
 
             if (keyH.upPressed) {
                 direction = "up";
@@ -70,25 +61,33 @@ public class Player extends Entity {
             collisionOn = false;
             gp.cChecker.checkTile(this);
 
-            if(collisionOn==false){
 
+            if (collisionOn == false) {
 
-                switch (direction){
+                switch (direction) {
                     case "up":
-                        worldY -= speed;
+                        if (worldY - speed >= 0) { //Verifica se não vai além do topo
+                            worldY -= speed;
+                        }
                         break;
                     case "down":
-                        worldY += speed;
+                        if (worldY + speed <= gp.worldHeight - gp.tileSize) { //Verifica se não vai além do fundo
+                            worldY += speed;
+                        }
                         break;
                     case "left":
-                        worldX -= speed;
+                        if (worldX - speed >= 0) { //Verifica se não vai além da esquerda
+                            worldX -= speed;
+                        }
                         break;
                     case "right":
-                        worldX += speed;
+                        if (worldX + speed <= gp.worldWidth - gp.tileSize) { //Verifica se não vai além da direita
+                            worldX += speed;
+                        }
                         break;
                 }
-
             }
+
 
             spriteCounter++; //Conta quantas vezes o jogador se move e, quando atinge 20, troca a animação
             if (spriteCounter > 20) {
@@ -141,6 +140,25 @@ public class Player extends Entity {
                 }
                 break;
         }
-        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null); //O jogador é desenhado na posição (x, y) com o tamanho da célula (tileSize), que está definido no GamePanel.
+
+        int x = screenX;
+        int y = screenY;
+
+        if(screenX>worldX){
+            x = worldX;
+        }
+        if(screenY>worldY){
+            y = worldY;
+        }
+        int rightOffset=gp.screenWidth - screenX;
+        if(rightOffset>gp.worldWidth - worldX){
+            x=gp.screenWidth-(gp.worldWidth - worldX);
+        }
+        int bottomOffset=gp.screenHeight - screenY;
+        if(bottomOffset>gp.worldHeight - worldY){
+            y=gp.screenHeight-(gp.worldHeight - worldY);
+        }
+
+        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null); //O jogador é desenhado na posição (x, y) com o tamanho da célula (tileSize), que está definido no GamePanel.
     }
 }
